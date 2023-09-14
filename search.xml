@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search> 
+  
+  
+    
+    <entry>
+      <title>XSS各种过滤手段，如何绕过写payload</title>
+      <link href="/2023/09/13/XSS%E5%90%84%E7%A7%8D%E8%BF%87%E6%BB%A4%E6%89%8B%E6%AE%B5%EF%BC%8C%E5%A6%82%E4%BD%95%E7%BB%95%E8%BF%87%E5%86%99payload/"/>
+      <url>/2023/09/13/XSS%E5%90%84%E7%A7%8D%E8%BF%87%E6%BB%A4%E6%89%8B%E6%AE%B5%EF%BC%8C%E5%A6%82%E4%BD%95%E7%BB%95%E8%BF%87%E5%86%99payload/</url>
+      
+        <content type="html"><![CDATA[<h1 id="XSS简介"><a href="#XSS简介" class="headerlink" title="XSS简介"></a>XSS简介</h1><p>XSS全称是Cross Site Scripting即跨站脚本，当目标网站目标用户浏览器渲染HTML文档的过程中，出现了不被预期的脚本指令并执行时，意思就是说可以任意执行js代码，包括js的而已代码</p><h2 id="如何进行payload的构造："><a href="#如何进行payload的构造：" class="headerlink" title="如何进行payload的构造："></a>如何进行payload的构造：</h2><p>我们知道xss漏洞不会这么简单的被你发现，通常来说开发者都会对用户输入的东西进行过滤，比如简单的就是 将<code>&lt;script&gt;</code> <code>&lt;ifraname&gt;</code>还有&lt; 等进行过滤，用户输入的时候就可以防止js命令随意的执行，但是我们知道这种方法并不是绝对安全的，我们可以通过其他标签来构造payload，在ctf比赛中非常喜欢考察。</p><h3 id="事件过滤："><a href="#事件过滤：" class="headerlink" title="事件过滤："></a>事件过滤：</h3><p>例如：</p><pre><code class="无">onbeforeprintonbeforeunloadonerroronhaschangeonloadonmessageonofflineononlineonpagehideonpageshowonpopstate</code></pre><p>一些常见的fuzz，我们在渗透测试中可以进行输入测试，对它进行fuzz测试</p><p>测试到没有进行过滤的事件，那么我们可以用来构造payload</p><pre><code class="javascript">&lt;a href=&quot;javascript:alert(&#39;xss&#39;)&quot;&gt;点&lt;/a&gt;</code></pre><h4 id="敏感关键词（字符串过滤）"><a href="#敏感关键词（字符串过滤）" class="headerlink" title="敏感关键词（字符串过滤）"></a>敏感关键词（字符串过滤）</h4><p>关键字过滤大部分是针对敏感变量或函数而进行的，如cookie、eval等，这部分的过滤可通过字符串拼接、编码解码等方法进行绕过。</p><h4 id="字符串拼接与混淆"><a href="#字符串拼接与混淆" class="headerlink" title="字符串拼接与混淆"></a>字符串拼接与混淆</h4><p>在Javascript中可以通过调用 数组来执行xss命令，比如</p><pre><code class="javascript">window[&#39;alert&#39;](/xss/)</code></pre><p>将base64转换为原来的，输出的那么就是 alert 了</p><h2 id="编码解码"><a href="#编码解码" class="headerlink" title="编码解码"></a>编码解码</h2><pre><code>xss漏洞中常见的编码方式HTML进制编码：十进制（a）、十六进制css进制编码： 兼容HTML中的进制表现形式，十进制、十六进制Javascript进制编码：八进制、十六进制、Unicode编、ASCIIurl编码：%61（包含%什么的，我们常在url栏可以看到）JSFUCK编码</code></pre><h2 id="过滤“-”"><a href="#过滤“-”" class="headerlink" title="过滤“.”"></a>过滤“.”</h2><p>在Javascript中使用with 可以设置变量的作用域，利用此特征可以对“.”进行过滤</p><pre><code>with(document)alert(cookie);</code></pre><h3 id="空格过滤"><a href="#空格过滤" class="headerlink" title="空格过滤"></a>空格过滤</h3><p>在标签可以使用 0x09、0x10、0x12、0x13、0x0a 等代替空格进行过滤</p><pre><code>https://xxx.com/xss.php?text=&lt;img0x09src=javascript:alert(&#39;xss&#39;)&gt;</code></pre><h3 id="SVG标签"><a href="#SVG标签" class="headerlink" title="SVG标签"></a>SVG标签</h3><p>svg标签和语句遵循的规则是直接继承xml而不是html，区别在于svg内部的script标签中允许在部分进制或编码后的字符（比如实体编码）</p><p>字符串集编码导致绕过<br>当字符集编码存在问题时常常会导致一些出乎意料的绕过。</p>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+  
+  
+</search>
